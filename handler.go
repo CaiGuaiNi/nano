@@ -52,6 +52,7 @@ func hbdEncode() {
 		"code": 200,
 		"sys":  map[string]float64{"heartbeat": env.heartbeat.Seconds()},
 	})
+
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +79,7 @@ type (
 
 	unhandledMessage struct {
 		agent   *agent
-		lastMid uint
+		lastMid uint32
 		handler reflect.Method
 		args    []reflect.Value
 	}
@@ -229,6 +230,7 @@ func (h *handlerService) handle(conn net.Conn) {
 		}
 
 		// TODO(warning): decoder use slice for performance, packet data should be copy before next Decode
+		logger.Println("Recive msg len : " , n)
 		packets, err := agent.decoder.Decode(buf[:n])
 		if err != nil {
 			logger.Println(err.Error())
@@ -288,17 +290,16 @@ func (h *handlerService) processPacket(agent *agent, p *packet.Packet) error {
 }
 
 func (h *handlerService) processMessage(agent *agent, msg *message.Message) {
-	var lastMid uint
-	switch msg.Type {
-	case message.Request:
-		lastMid = msg.ID
-	case message.Notify:
-		lastMid = 0
+	var lastMid uint32
+	lastMid = msg.ID
+	route, e := message.GetRouteByID(msg.ID)
+	if e != nil {
+		logger.Println(e)
+		return
 	}
-
-	handler, ok := h.handlers[msg.Route]
+	handler, ok := h.handlers[route]
 	if !ok {
-		logger.Println(fmt.Sprintf("nano/handler: %s not found(forgot registered?)", msg.Route))
+		logger.Println(fmt.Sprintf("nano/handler: %s not found(forgot registered?)", route))
 		return
 	}
 

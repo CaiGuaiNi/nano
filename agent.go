@@ -52,7 +52,7 @@ type (
 		// regular agent member
 		session *session.Session    // session
 		conn    net.Conn            // low-level conn fd
-		lastMid uint                // last message id
+		lastMid uint32               // last message id
 		state   int32               // current agent state
 		chDie   chan struct{}       // wait for close
 		chSend  chan pendingMessage // push message queue
@@ -63,9 +63,7 @@ type (
 	}
 
 	pendingMessage struct {
-		typ     message.Type // message type
-		route   string       // message route(push)
-		mid     uint         // response message id(response)
+		mid     uint32         // response message id
 		payload interface{}  // payload
 	}
 )
@@ -89,44 +87,13 @@ func newAgent(conn net.Conn) *agent {
 	return a
 }
 
-func (a *agent) MID() uint {
+func (a *agent) MID() uint32 {
 	return a.lastMid
 }
 
-// Push, implementation for session.NetworkEntity interface
-func (a *agent) Push(route string, v interface{}) error {
-	if a.status() == statusClosed {
-		return ErrBrokenPipe
-	}
-
-	if len(a.chSend) >= agentWriteBacklog {
-		return ErrBufferExceed
-	}
-
-	if env.debug {
-		switch d := v.(type) {
-		case []byte:
-			logger.Println(fmt.Sprintf("Type=Push, ID=%d, UID=%d, Route=%s, Data=%dbytes",
-				a.session.ID(), a.session.UID(), route, len(d)))
-		default:
-			logger.Println(fmt.Sprintf("Type=Push, ID=%d, UID=%d, Route=%s, Data=%+v",
-				a.session.ID(), a.session.UID(), route, v))
-		}
-	}
-
-	a.chSend <- pendingMessage{typ: message.Push, route: route, payload: v}
-	return nil
-}
-
 // Response, implementation for session.NetworkEntity interface
 // Response message to session
-func (a *agent) Response(v interface{}) error {
-	return a.ResponseMID(a.lastMid, v)
-}
-
-// Response, implementation for session.NetworkEntity interface
-// Response message to session
-func (a *agent) ResponseMID(mid uint, v interface{}) error {
+func (a *agent) Send(mid uint32, v interface{}) error {
 	if a.status() == statusClosed {
 		return ErrBrokenPipe
 	}
@@ -142,15 +109,15 @@ func (a *agent) ResponseMID(mid uint, v interface{}) error {
 	if env.debug {
 		switch d := v.(type) {
 		case []byte:
-			logger.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, MID=%d, Data=%dbytes",
+			logger.Println(fmt.Sprintf("[]byte Type=Response, ID=%d, UID=%d, MID=%d, Data=%d bytes",
 				a.session.ID(), a.session.UID(), mid, len(d)))
 		default:
-			logger.Println(fmt.Sprintf("Type=Response, ID=%d, UID=%d, MID=%d, Data=%+v",
+			logger.Println(fmt.Sprintf("default Type=Response, ID=%d, UID=%d, MID=%d, Data=%+v",
 				a.session.ID(), a.session.UID(), mid, v))
 		}
 	}
 
-	a.chSend <- pendingMessage{typ: message.Response, mid: mid, payload: v}
+	a.chSend <- pendingMessage{mid: mid, payload: v}
 	return nil
 }
 
@@ -249,9 +216,7 @@ func (a *agent) write() {
 
 			// construct message and encode
 			m := &message.Message{
-				Type:  data.typ,
 				Data:  payload,
-				Route: data.route,
 				ID:    data.mid,
 			}
 			em, err := m.Encode()

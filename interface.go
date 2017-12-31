@@ -77,7 +77,7 @@ func OnSessionClosed(cb SessionClosedHandler) {
 }
 
 // SetDictionary set routes map, TODO(warning): set dictionary in runtime would be a dangerous operation!!!!!!
-func SetDictionary(dict map[string]uint16) {
+func SetDictionary(dict map[string]uint32) {
 	message.SetDictionary(dict)
 }
 

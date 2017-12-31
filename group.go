@@ -83,7 +83,7 @@ func (c *Group) Members() []int64 {
 }
 
 // Multicast  push  the message to the filtered clients
-func (c *Group) Multicast(route string, v interface{}, filter SessionFilter) error {
+func (c *Group) Multicast(mid uint32, v interface{}, filter SessionFilter) error {
 	if c.isClosed() {
 		return ErrClosedGroup
 	}
@@ -94,7 +94,7 @@ func (c *Group) Multicast(route string, v interface{}, filter SessionFilter) err
 	}
 
 	if env.debug {
-		logger.Println(fmt.Sprintf("Type=Multicast Route=%s, Data=%+v", route, v))
+		logger.Println(fmt.Sprintf("Type=Multicast Mid=%s, Data=%+v", mid, v))
 	}
 
 	c.mu.RLock()
@@ -104,7 +104,7 @@ func (c *Group) Multicast(route string, v interface{}, filter SessionFilter) err
 		if !filter(s) {
 			continue
 		}
-		if err = s.Push(route, data); err != nil {
+		if err = s.Send(mid, data); err != nil {
 			logger.Println(err.Error())
 		}
 	}
@@ -113,7 +113,7 @@ func (c *Group) Multicast(route string, v interface{}, filter SessionFilter) err
 }
 
 // Broadcast push  the message(s) to  all members
-func (c *Group) Broadcast(route string, v interface{}) error {
+func (c *Group) Broadcast(mid uint32, v interface{}) error {
 	if c.isClosed() {
 		return ErrClosedGroup
 	}
@@ -124,14 +124,14 @@ func (c *Group) Broadcast(route string, v interface{}) error {
 	}
 
 	if env.debug {
-		logger.Println(fmt.Sprintf("Type=Broadcast Route=%s, Data=%+v", route, v))
+		logger.Println(fmt.Sprintf("Type=Broadcast Mid=%d, Data=%+v", mid, v))
 	}
 
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
 	for _, s := range c.sessions {
-		if err = s.Push(route, data); err != nil {
+		if err = s.Send(mid, data); err != nil {
 			logger.Println(fmt.Sprintf("Session push message error, ID=%d, UID=%d, Error=%s", s.ID(), s.UID(), err.Error()))
 		}
 	}

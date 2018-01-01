@@ -28,10 +28,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lonnng/nano/internal/codec"
-	"github.com/lonnng/nano/internal/message"
-	"github.com/lonnng/nano/internal/packet"
-	"github.com/lonnng/nano/session"
+	"github.com/CaiGuaiNi/nano/internal/codec"
+	"github.com/CaiGuaiNi/nano/internal/message"
+	"github.com/CaiGuaiNi/nano/internal/packet"
+	"github.com/CaiGuaiNi/nano/session"
 )
 
 const (
@@ -52,7 +52,7 @@ type (
 		// regular agent member
 		session *session.Session    // session
 		conn    net.Conn            // low-level conn fd
-		lastMid uint32               // last message id
+		lastMid uint32              // last message id
 		state   int32               // current agent state
 		chDie   chan struct{}       // wait for close
 		chSend  chan pendingMessage // push message queue
@@ -63,8 +63,8 @@ type (
 	}
 
 	pendingMessage struct {
-		mid     uint32         // response message id
-		payload interface{}  // payload
+		mid     uint32      // response message id
+		payload interface{} // payload
 	}
 )
 
@@ -216,8 +216,8 @@ func (a *agent) write() {
 
 			// construct message and encode
 			m := &message.Message{
-				Data:  payload,
-				ID:    data.mid,
+				Data: payload,
+				ID:   data.mid,
 			}
 			em, err := m.Encode()
 			if err != nil {

@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lonnng/nano"
-	"github.com/lonnng/nano/benchmark/testdata"
-	"github.com/lonnng/nano/component"
-	"github.com/lonnng/nano/serialize/protobuf"
-	"github.com/lonnng/nano/session"
+	"github.com/CaiGuaiNi/nano"
+	"github.com/CaiGuaiNi/nano/benchmark/testdata"
+	"github.com/CaiGuaiNi/nano/component"
+	"github.com/CaiGuaiNi/nano/serialize/protobuf"
+	"github.com/CaiGuaiNi/nano/session"
 )
 
 const (

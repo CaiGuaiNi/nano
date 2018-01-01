@@ -21,8 +21,8 @@
 package nano
 
 import (
-	"github.com/lonnng/nano/serialize"
-	"github.com/lonnng/nano/serialize/protobuf"
+	"github.com/CaiGuaiNi/nano/serialize"
+	"github.com/CaiGuaiNi/nano/serialize/protobuf"
 )
 
 // Default serializer

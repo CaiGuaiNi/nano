@@ -6,7 +6,7 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-	dict := map[string]uint16{
+	dict := map[string]uint32{
 		"test.test.test":  100,
 		"test.test.test1": 101,
 		"test.test.test2": 102,
@@ -14,11 +14,8 @@ func TestEncode(t *testing.T) {
 	}
 	SetDictionary(dict)
 	m1 := &Message{
-		Type:       Request,
 		ID:         100,
-		Route:      "test.test.test",
 		Data:       []byte(`hello world`),
-		compressed: true,
 	}
 	em1, err := m1.Encode()
 	if err != nil {
@@ -34,9 +31,7 @@ func TestEncode(t *testing.T) {
 	}
 
 	m2 := &Message{
-		Type:  Request,
 		ID:    100,
-		Route: "test.test.test4",
 		Data:  []byte(`hello world`),
 	}
 	em2, err := m2.Encode()
@@ -53,7 +48,6 @@ func TestEncode(t *testing.T) {
 	}
 
 	m3 := &Message{
-		Type: Response,
 		ID:   100,
 		Data: []byte(`hello world`),
 	}
@@ -71,7 +65,6 @@ func TestEncode(t *testing.T) {
 	}
 
 	m4 := &Message{
-		Type: Response,
 		ID:   100,
 		Data: []byte(`hello world`),
 	}

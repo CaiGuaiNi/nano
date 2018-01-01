@@ -67,8 +67,8 @@ var (
 
 // Message represents a unmarshaled message or a message which to be marshaled
 type Message struct {
-	ID         uint32   // unique id, zero while notify mode
-	Data       []byte // payload
+	ID   uint32 // unique id, zero while notify mode
+	Data []byte // payload
 }
 
 // New returns a new message instance
@@ -108,7 +108,7 @@ func Encode(m *Message) ([]byte, error) {
 }
 
 // Decode unmarshal the bytes slice to a message
-// See ref: https://github.com/lonnng/nano/blob/master/docs/communication_protocol.md
+// See ref: https://github.com/CaiGuaiNi/nano/blob/master/docs/communication_protocol.md
 func Decode(data []byte) (*Message, error) {
 	if len(data) < msgHeadLength {
 		return nil, ErrInvalidMessage
@@ -141,7 +141,7 @@ func SetDictionary(dict map[string]uint32) {
 	}
 }
 
-func GetRouteByID(mid uint32) (string , error) {
+func GetRouteByID(mid uint32) (string, error) {
 	if route, ok := codes[mid]; ok {
 		return route, nil
 	}

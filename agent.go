@@ -63,7 +63,7 @@ type (
 	}
 
 	pendingMessage struct {
-		mid     uint32      // response message id
+		mid     uint32      // message id
 		payload interface{} // payload
 	}
 )
@@ -91,6 +91,16 @@ func (a *agent) MID() uint32 {
 	return a.lastMid
 }
 
+func (a *agent) send(m pendingMessage) (err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			err = ErrBrokenPipe
+		}
+	}()
+	a.chSend <- m
+	return
+}
+
 // Response, implementation for session.NetworkEntity interface
 // Response message to session
 func (a *agent) Send(mid uint32, v interface{}) error {
@@ -109,16 +119,15 @@ func (a *agent) Send(mid uint32, v interface{}) error {
 	if env.debug {
 		switch d := v.(type) {
 		case []byte:
-			logger.Println(fmt.Sprintf("[]byte Type=Response, ID=%d, UID=%d, MID=%d, Data=%d bytes",
+			logger.Println(fmt.Sprintf("[]byte Type=Send, ID=%d, UID=%d, MID=%d, Data=%d bytes",
 				a.session.ID(), a.session.UID(), mid, len(d)))
 		default:
-			logger.Println(fmt.Sprintf("default Type=Response, ID=%d, UID=%d, MID=%d, Data=%+v",
+			logger.Println(fmt.Sprintf("default Type=Send, ID=%d, UID=%d, MID=%d, Data=%+v",
 				a.session.ID(), a.session.UID(), mid, v))
 		}
 	}
 
-	a.chSend <- pendingMessage{mid: mid, payload: v}
-	return nil
+	return a.send(pendingMessage{mid: mid, payload: v})
 }
 
 // Close, implementation for session.NetworkEntity interface

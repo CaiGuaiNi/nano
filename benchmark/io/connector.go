@@ -25,10 +25,10 @@ import (
 	"net"
 	"sync"
 
-	"github.com/CaiGuaiNi/nano/internal/codec"
-	"github.com/CaiGuaiNi/nano/internal/message"
-	"github.com/CaiGuaiNi/nano/internal/packet"
 	"github.com/golang/protobuf/proto"
+	"github.com/nbldyyhh/nano/internal/codec"
+	"github.com/nbldyyhh/nano/internal/message"
+	"github.com/nbldyyhh/nano/internal/packet"
 )
 
 var (

@@ -27,11 +27,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/CaiGuaiNi/nano/component"
-	"github.com/CaiGuaiNi/nano/internal/codec"
-	"github.com/CaiGuaiNi/nano/internal/message"
-	"github.com/CaiGuaiNi/nano/internal/packet"
-	"github.com/CaiGuaiNi/nano/session"
+	"github.com/nbldyyhh/nano/component"
+	"github.com/nbldyyhh/nano/internal/codec"
+	"github.com/nbldyyhh/nano/internal/message"
+	"github.com/nbldyyhh/nano/internal/packet"
+	"github.com/nbldyyhh/nano/session"
 )
 
 // Unhandled message buffer size
